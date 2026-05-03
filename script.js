@@ -140,11 +140,29 @@ const revealObserver = new IntersectionObserver(entries => {
 
 document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
-document.getElementById('contactForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  this.style.display = 'none';
-  document.getElementById('formConfirm').style.display = 'block';
-});
+if (window.emailjs) {
+  emailjs.init('LFZqniCtP4wgYUGC-');
+}
+
+const contactForm = document.getElementById('contactForm');
+const formConfirm = document.getElementById('formConfirm');
+
+if (contactForm && formConfirm && window.emailjs) {
+  contactForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    try {
+      await emailjs.sendForm('service_9nlij2c', 'template_praxintesis', this);
+      this.reset();
+      formConfirm.textContent = '✓ ¡Mensaje recibido! Te contactaremos en las próximas horas.';
+      formConfirm.style.display = 'block';
+    } catch (error) {
+      console.error('EmailJS error:', error);
+      formConfirm.textContent = 'No se pudo enviar el mensaje. Intenta de nuevo en unos minutos.';
+      formConfirm.style.display = 'block';
+    }
+  });
+}
 
 function subscribeNewsletter() {
   const input = document.getElementById('newsletterEmail');
